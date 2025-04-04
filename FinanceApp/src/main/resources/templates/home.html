@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Dashboard')}"></head>
+<body>
+  <div th:replace="~{fragments/header :: header}"></div>
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="card shadow">
+          <div class="card-body">
+            <h5 class="card-title">Quick Actions</h5>
+            <a th:href="@{/budgets/{userId}/view(userId=${user.id})}" class="btn btn-primary w-100 mb-2">Manage Budget</a>
+            <a th:href="@{/spendings/add}" class="btn btn-success w-100">Add Spending</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="card shadow">
+          <div class="card-body">
+            <h5 class="card-title">Current Budget Overview</h5>
+            <div th:if="${currentBudget}">
+              <!-- Budget summary -->
+            </div>
+            <div th:unless="${currentBudget}" class="alert alert-info">
+              No budget set for this month
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div th:replace="~{fragments/footer}"></div>
+</body>
+</html>
