@@ -17,7 +17,6 @@ public class Spending {
 
     private double amount;
     private LocalDate date;
-    private String description;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -49,14 +48,6 @@ public class Spending {
 
     public void setDate(LocalDate date) {
         this.date = date;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public User getUser() {

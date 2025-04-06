@@ -73,4 +73,14 @@ public class Budget {
     public void setCategories(@NotEmpty List<BudgetCategory> categories) {
         this.categories = categories;
     }
+
+    public double getTotalRemaining() {
+        double totalAllocated = 0.0;
+        if (categories != null) {
+            totalAllocated = categories.stream()
+                    .mapToDouble(BudgetCategory::getAmount)
+                    .sum();
+        }
+        return income - totalAllocated;
+    }
 }

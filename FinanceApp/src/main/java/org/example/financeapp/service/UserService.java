@@ -1,5 +1,6 @@
 package org.example.financeapp.service;
 
+import jakarta.transaction.Transactional;
 import org.example.financeapp.model.User;
 import org.example.financeapp.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +18,9 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public User registerUser(User user) {
+        System.out.println("trying to create user - Service");
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new IllegalArgumentException("Username exists!");
         }

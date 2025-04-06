@@ -1,58 +1,73 @@
 package org.example.financeapp.controller;
 
+import jakarta.validation.Valid;
 import org.example.financeapp.model.Budget;
+import org.example.financeapp.model.BudgetCategory;
+import org.example.financeapp.model.Category;
+import org.example.financeapp.model.User;
 import org.example.financeapp.service.BudgetService;
-import org.example.financeapp.service.UserService;
-import org.springframework.http.HttpStatus;
+import org.example.financeapp.service.CategoryService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 @RequestMapping("/budgets")
 public class BudgetController {
     private final BudgetService budgetService;
-    private final UserService userService;
+    private final CategoryService categoryService;
 
-    public BudgetController(BudgetService budgetService, UserService userService) {
+    public BudgetController(BudgetService budgetService, CategoryService categoryService) {
         this.budgetService = budgetService;
-        this.userService = userService;
+        this.categoryService = categoryService;
     }
 
-    @PostMapping("/{userId}")
-    public String createOrUpdateBudget(
-            @PathVariable Long userId,
-            @ModelAttribute Budget budget
-    ) {
-        budgetService.saveBudget(userId, budget);
-        return "redirect:/budgets/" + userId + "/view"; // Redirect to view
+    @GetMapping
+    public String showBudgetHistory(Model model, @AuthenticationPrincipal User user) {
+        model.addAttribute("user", user);
+        List<Budget> budgetHistory = budgetService.getAllBudgetsByUser(user.getId());
+        model.addAttribute("budgetHistory", budgetHistory);
+        return "budget_history";
     }
 
-    @GetMapping("/{userId}/{month}/{year}")
-    public Budget getBudgetByMonthYear(
-            @PathVariable Long userId,
-            @PathVariable int month,
-            @PathVariable int year
-    ) {
-        return budgetService.getBudgetByUserAndMonthYear(userId, month, year);
-    }
+    @GetMapping("/add")
+    public String showAddBudgetForm(Model model, @AuthenticationPrincipal User user){
+        model.addAttribute("user", user);
+        List<Category> allCategories = categoryService.getAllCategories();
+        model.addAttribute("categories", allCategories);
 
-    @GetMapping("/{userId}")
-    public List<Budget> getAllBudgetsForUser(@PathVariable Long userId) {
-        return budgetService.getAllBudgetsByUser(userId);
-    }
-
-    @GetMapping("/{userId}/view")
-    public String getBudgetPage(@PathVariable Long userId, Model model) {
-        model.addAttribute("user", userService.getUserById(userId));
-        model.addAttribute("budgets", budgetService.getAllBudgetsByUser(userId));
+        Budget budget = new Budget();
+        List<BudgetCategory> budgetCategories = new ArrayList<>();
+        for (Category cat : allCategories) {
+            BudgetCategory bc = new BudgetCategory();
+            bc.setCategory(cat);
+            budgetCategories.add(bc);
+        }
+        budget.setCategories(budgetCategories);
+        model.addAttribute("budget", budget);
         return "budget";
     }
 
-    @DeleteMapping("/{budgetId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteBudget(@PathVariable Long budgetId) {
-        budgetService.deleteBudget(budgetId);
+    @PostMapping("/save")
+    public String saveBudget(
+            @Valid @ModelAttribute("budget") Budget budget,
+            BindingResult bindingResult,
+            Model model,
+            @AuthenticationPrincipal User currentUser) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("categories", categoryService.getAll());
+            return "budget";
+        }
+
+        if (budget.getCategories() != null) {
+            budget.getCategories().forEach(budgetCategory -> budgetCategory.setBudget(budget));
+        }
+        budgetService.saveBudget(currentUser.getId(), budget);
+        return "/home";
     }
 }

@@ -14,14 +14,18 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    // Get all predefined categories
+
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
 
-    // Get a category by ID (for validation)
+
     public Category getCategoryById(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NoSuchElementException("Category not found"));
+    }
+
+    public Object getAll() {
+        return categoryRepository.findAll();
     }
 }

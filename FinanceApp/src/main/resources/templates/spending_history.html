@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Spending History')}"></head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<div class="container mt-4">
+    <form th:action="@{/spendings}" method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <select name="categoryId" class="form-control">
+                    <option value="">All Categories</option>
+                    <option th:each="cat : ${categories}"
+                            th:value="${cat.id}"
+                            th:text="${cat.name}">
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </div>
+    </form>
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-body">
+                <h5 class="card-title">Spending History</h5>
+                <div th:if="${spendingHistory}">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="spending : ${spendingHistory}">
+                            <td th:text="${#temporals.format(spending.date, 'MM/dd/yyyy')}">Date</td>
+                            <td th:text="${spending.category.name}">Category</td>
+                            <td th:text="${#numbers.formatDecimal(spending.amount, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div th:unless="${spendingHistory}" class="alert alert-info">
+                    No spending history found.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/footer}"></div>
+</body>
+</html>

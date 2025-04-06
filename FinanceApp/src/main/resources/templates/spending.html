@@ -36,8 +36,10 @@
             <div class="col-md-4">
                 <div class="card shadow">
                     <div class="card-body">
-                        <h5 class="card-title">Recent Transactions</h5>
+                        <h5 class="card-title">Recent Spending</h5>
                         <div th:each="spending : ${spendings}">
+                            <div th:text="${spending.category?.name} ?: 'No category'"></div>
+                            <div th:text="${spending.amount} ?: '0.00'"></div>
                         </div>
                     </div>
                 </div>

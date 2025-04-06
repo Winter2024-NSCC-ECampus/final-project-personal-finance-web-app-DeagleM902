@@ -8,9 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public interface SpendingRepository extends JpaRepository<Spending, Long> {
-    List<Spending> findByUser_IdAndDateBetween(Long userId, LocalDate start, LocalDate end);
-
     List<Spending> findByUser_Id(Long userId);
 
-    List<Spending> findByUser_IdAndCategory_Id(Long userId, Long categoryId);
+    List<Spending> findTop10ByUser_IdOrderByDateDesc(Long userId);
+
+    List<Spending> findByUserIdAndCategoryId(Long userId, Long categoryId);
 }

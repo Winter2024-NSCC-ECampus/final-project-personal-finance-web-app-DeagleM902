@@ -9,8 +9,11 @@
         <div class="card shadow">
           <div class="card-body">
             <h5 class="card-title">Quick Actions</h5>
-            <a th:href="@{/budgets/{userId}/view(userId=${user.id})}" class="btn btn-primary w-100 mb-2">Manage Budget</a>
+            <a th:href="@{/budgets/add}" class="btn btn-primary w-100 mb-2">Manage Budget</a>
             <a th:href="@{/spendings/add}" class="btn btn-success w-100">Add Spending</a>
+            <hr>
+            <a th:href="@{/budgets}" class="btn btn-primary w-100 mb-2">Budget History</a>
+            <a th:href="@{/spendings}" class="btn btn-success w-100">Spending History</a>
           </div>
         </div>
       </div>
@@ -20,7 +23,35 @@
           <div class="card-body">
             <h5 class="card-title">Current Budget Overview</h5>
             <div th:if="${currentBudget}">
-              <!-- Budget summary -->
+              <div class="mb-3">
+                <h6>Budget for <span th:text="${currentBudget.month}">Month</span>/<span th:text="${currentBudget.year}">Year</span></h6>
+                <p>
+                  <strong>Income:</strong>
+                  $<span th:text="${#numbers.formatDecimal(currentBudget.income, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </p>
+              </div>
+              <div>
+                <table class="table table-striped">
+                  <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Allocated Amount</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr th:each="budgetCategory : ${currentBudget.categories}">
+                    <td th:text="${budgetCategory.category.name}">Category</td>
+                    <td th:text="${#numbers.formatDecimal(budgetCategory.amount, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="mt-3">
+                <p>
+                  <strong>Total Remaining:</strong>
+                  $<span th:text="${#numbers.formatDecimal(currentBudget.totalRemaining, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </p>
+              </div>
             </div>
             <div th:unless="${currentBudget}" class="alert alert-info">
               No budget set for this month

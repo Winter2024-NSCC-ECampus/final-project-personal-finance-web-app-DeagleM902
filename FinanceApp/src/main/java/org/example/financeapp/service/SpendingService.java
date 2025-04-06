@@ -1,5 +1,6 @@
 package org.example.financeapp.service;
 
+import org.example.financeapp.model.Budget;
 import org.example.financeapp.model.Spending;
 import org.example.financeapp.model.User;
 import org.example.financeapp.model.Category;
@@ -28,7 +29,6 @@ public class SpendingService {
         this.categoryRepository = categoryRepository;
     }
 
-    // Record a new spending transaction
     @Transactional
     public Spending addSpending(Long userId, Long categoryId, Spending spending) {
         User user = userRepository.findById(userId)
@@ -41,30 +41,13 @@ public class SpendingService {
         return spendingRepository.save(spending);
     }
 
-    // Get all spendings for a user within a date range
-    public List<Spending> getSpendingsByUserAndDateRange(Long userId, LocalDate start, LocalDate end) {
-        return spendingRepository.findByUser_IdAndDateBetween(userId, start, end);
+    public List<Spending> getRecent(Long userId) {
+        return spendingRepository.findTop10ByUser_IdOrderByDateDesc(userId);
     }
 
-    // Calculate total spending for a user in a category
-    public double getTotalSpendingByCategory(Long userId, Long categoryId) {
-        return spendingRepository.findByUser_IdAndCategory_Id(userId, categoryId)
-                .stream()
-                .mapToDouble(Spending::getAmount)
-                .sum();
-    }
+    public List<Spending> getAllSpendingsByUser(Long userId) {return spendingRepository.findByUser_Id(userId);}
 
-    // Calculate total spending for a user (all categories)
-    public double getTotalSpending(Long userId) {
-        return spendingRepository.findByUser_Id(userId)
-                .stream()
-                .mapToDouble(Spending::getAmount)
-                .sum();
-    }
-
-    public List<Spending> getRecentSpendings(Long userId) {
-        LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusDays(30); // Last 30 days
-        return spendingRepository.findByUser_IdAndDateBetween(userId, startDate, endDate);
+    public List<Spending> getSpendingsByUserAndCategory(Long userId, Long categoryId) {
+        return spendingRepository.findByUserIdAndCategoryId(userId, categoryId);
     }
 }
